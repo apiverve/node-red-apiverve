@@ -48,13 +48,23 @@ Parameters set in the node, then `msg.payload`, then `msg.params` are merged in 
 
 Errors go to a **Catch** node with `msg.statusCode` set: `401` invalid key, `403` key not allowed for this call, `429` rate limit or no credits left.
 
-## Example
+## Examples
 
-**Menu → Import → Examples → @apiverve/node-red-apiverve → validate-an-email** imports an inject → apiverve → debug flow.
+**Menu → Import → Examples → @apiverve/node-red-apiverve** has four flows:
+
+| Flow | What it does |
+|---|---|
+| `validate-an-email` | Inject an address, see the validation result in the debug panel |
+| `screen-signup-emails` | `POST /signup` endpoint: 201 for a valid, permanent address, 422 for an invalid or disposable one |
+| `geolocate-webhook-callers` | `GET /whereami` endpoint that returns the caller's location and network |
+| `morning-weather-and-rates` | Every day at 07:00, fetches a city's weather and the USD/EUR rate |
+
+The two HTTP flows answer with a 502 and the reason if the API call fails, so requests never hang.
 
 ## Links
 
 - Browse every API: [apiverve.com/marketplace](https://apiverve.com/marketplace)
+- Node-RED guide: [docs.apiverve.com/integrations/node-red](https://docs.apiverve.com/integrations/node-red)
 - Docs: [docs.apiverve.com](https://docs.apiverve.com)
 - Plans and credits: [apiverve.com/pricing](https://apiverve.com/pricing)
 

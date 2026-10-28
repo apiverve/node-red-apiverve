@@ -1,6 +1,6 @@
 {
   "name": "@apiverve/node-red-apiverve",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node-RED node for APIVerve: call any of 380+ APIs (email and phone validation, IP lookup, weather, currency, DNS, PDF and more) with one API key.",
   "keywords": [
     "node-red",
@@ -12,7 +12,7 @@
     "currency",
     "dns"
   ],
-  "homepage": "https://apiverve.com",
+  "homepage": "https://docs.apiverve.com/integrations/node-red",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/apiverve/node-red-apiverve.git"

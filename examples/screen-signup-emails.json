@@ -1,0 +1,200 @@
+[
+    {
+        "id": "b2e1c0de00000001",
+        "type": "http in",
+        "name": "POST /signup",
+        "url": "/signup",
+        "method": "post",
+        "upload": false,
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "b2e1c0de00000002"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000002",
+        "type": "function",
+        "name": "email from body",
+        "func": "msg.signup = msg.payload;\nmsg.payload = { email: msg.payload.email };\nreturn msg;",
+        "outputs": 1,
+        "x": 320,
+        "y": 100,
+        "wires": [
+            [
+                "b2e1c0de00000003"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000003",
+        "type": "apiverve",
+        "name": "Validate email",
+        "account": "b2e1c0de00000009",
+        "api": "emailvalidator",
+        "params": "",
+        "output": "data",
+        "x": 510,
+        "y": 100,
+        "wires": [
+            [
+                "b2e1c0de00000004"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000004",
+        "type": "switch",
+        "name": "accept?",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "jsonata_exp",
+                "v": "payload.isValid and $not(payload.isDisposable)",
+                "vt": "jsonata"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "outputs": 2,
+        "x": 690,
+        "y": 100,
+        "wires": [
+            [
+                "b2e1c0de00000005"
+            ],
+            [
+                "b2e1c0de00000006"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000005",
+        "type": "change",
+        "name": "201 accepted",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "201",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"ok\":true}",
+                "tot": "json"
+            }
+        ],
+        "x": 870,
+        "y": 80,
+        "wires": [
+            [
+                "b2e1c0de00000007"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000006",
+        "type": "change",
+        "name": "422 rejected",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "422",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"ok\":false,\"error\":\"Use a real, permanent email address.\"}",
+                "tot": "json"
+            }
+        ],
+        "x": 870,
+        "y": 120,
+        "wires": [
+            [
+                "b2e1c0de00000007"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000007",
+        "type": "http response",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1050,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "b2e1c0de00000008",
+        "type": "comment",
+        "name": "Rejects invalid and disposable addresses before they reach your database",
+        "info": "POST JSON like {\"email\": \"jane@example.com\"} to /signup. Valid, permanent addresses get 201; invalid or throwaway ones get 422.",
+        "x": 300,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "b2e1c0de0000c0a1",
+        "type": "catch",
+        "name": "API failed",
+        "scope": [
+            "b2e1c0de00000003"
+        ],
+        "uncaught": false,
+        "x": 510,
+        "y": 180,
+        "wires": [
+            [
+                "b2e1c0de0000c0a2"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de0000c0a2",
+        "type": "change",
+        "name": "502 + reason",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "502",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"ok\":false,\"error\":error.message}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 690,
+        "y": 180,
+        "wires": [
+            [
+                "b2e1c0de00000007"
+            ]
+        ]
+    },
+    {
+        "id": "b2e1c0de00000009",
+        "type": "apiverve-config",
+        "name": "APIVerve"
+    }
+]

@@ -1,0 +1,115 @@
+[
+    {
+        "id": "c3e1c0de00000001",
+        "type": "http in",
+        "name": "GET /whereami",
+        "url": "/whereami",
+        "method": "get",
+        "upload": false,
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "c3e1c0de00000002"
+            ]
+        ]
+    },
+    {
+        "id": "c3e1c0de00000002",
+        "type": "function",
+        "name": "caller IP",
+        "func": "const fwd = msg.req.headers['x-forwarded-for'];\nmsg.payload = { ip: fwd ? fwd.split(',')[0].trim() : msg.req.ip };\nreturn msg;",
+        "outputs": 1,
+        "x": 310,
+        "y": 100,
+        "wires": [
+            [
+                "c3e1c0de00000003"
+            ]
+        ]
+    },
+    {
+        "id": "c3e1c0de00000003",
+        "type": "apiverve",
+        "name": "IP lookup",
+        "account": "c3e1c0de00000006",
+        "api": "iplookup",
+        "params": "",
+        "output": "data",
+        "x": 480,
+        "y": 100,
+        "wires": [
+            [
+                "c3e1c0de00000004"
+            ]
+        ]
+    },
+    {
+        "id": "c3e1c0de00000004",
+        "type": "http response",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 650,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "c3e1c0de00000005",
+        "type": "comment",
+        "name": "Returns the location and network of whoever calls the endpoint",
+        "info": "Behind a proxy, the first x-forwarded-for address is the caller. Swap the http in node for any webhook to enrich its requests.",
+        "x": 280,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "c3e1c0de0000c0a1",
+        "type": "catch",
+        "name": "API failed",
+        "scope": [
+            "c3e1c0de00000003"
+        ],
+        "uncaught": false,
+        "x": 510,
+        "y": 180,
+        "wires": [
+            [
+                "c3e1c0de0000c0a2"
+            ]
+        ]
+    },
+    {
+        "id": "c3e1c0de0000c0a2",
+        "type": "change",
+        "name": "502 + reason",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "502",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"ok\":false,\"error\":error.message}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 690,
+        "y": 180,
+        "wires": [
+            [
+                "c3e1c0de00000004"
+            ]
+        ]
+    },
+    {
+        "id": "c3e1c0de00000006",
+        "type": "apiverve-config",
+        "name": "APIVerve"
+    }
+]

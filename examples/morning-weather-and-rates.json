@@ -1,0 +1,8 @@
+[
+    { "id": "d4e1c0de00000001", "type": "inject", "name": "every day 07:00", "props": [{ "p": "payload" }], "repeat": "", "crontab": "00 07 * * *", "once": false, "topic": "", "payload": "", "payloadType": "date", "x": 150, "y": 100, "wires": [["d4e1c0de00000002", "d4e1c0de00000003"]] },
+    { "id": "d4e1c0de00000002", "type": "apiverve", "name": "Weather", "account": "d4e1c0de00000007", "api": "weatherforecast", "params": "{\"city\":\"London\"}", "output": "data", "x": 360, "y": 80, "wires": [["d4e1c0de00000004"]] },
+    { "id": "d4e1c0de00000003", "type": "apiverve", "name": "USD to EUR", "account": "d4e1c0de00000007", "api": "exchangerate", "params": "{\"currency1\":\"USD\",\"currency2\":\"EUR\"}", "output": "data", "x": 360, "y": 120, "wires": [["d4e1c0de00000004"]] },
+    { "id": "d4e1c0de00000004", "type": "debug", "name": "morning numbers", "active": true, "complete": "payload", "x": 560, "y": 100, "wires": [] },
+    { "id": "d4e1c0de00000005", "type": "comment", "name": "A daily feed: swap the debug node for a dashboard, email or chat node", "info": "Both calls run at 07:00. Change the city or currency pair in each node's Parameters field.", "x": 300, "y": 40, "wires": [] },
+    { "id": "d4e1c0de00000007", "type": "apiverve-config", "name": "APIVerve" }
+]
