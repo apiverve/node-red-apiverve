@@ -1,0 +1,149 @@
+<script type="text/javascript">
+    RED.nodes.registerType('apiverve-config', {
+        category: 'config',
+        defaults: { name: { value: 'APIVerve' } },
+        credentials: { apiKey: { type: 'password' } },
+        label: function () { return this.name || 'APIVerve'; },
+    });
+</script>
+
+<script type="text/html" data-template-name="apiverve-config">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="APIVerve">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-apiKey"><i class="fa fa-key"></i> API key</label>
+        <input type="password" id="node-config-input-apiKey" placeholder="Your APIVerve API key">
+    </div>
+    <div class="form-tips">Get a free key at <a href="https://dashboard.apiverve.com" target="_blank">dashboard.apiverve.com</a>. Leave it empty to use the <code>APIVERVE_API_KEY</code> environment variable.</div>
+</script>
+
+<script type="text/html" data-help-name="apiverve-config">
+    <p>Holds your APIVerve API key. One key works with every API.</p>
+    <p>The key is stored as a Node-RED credential, so it is not exported with your flows. If it is left empty, the node uses the <code>APIVERVE_API_KEY</code> environment variable.</p>
+</script>
+
+<script type="text/javascript">
+    (function () {
+        let catalog = null;
+        function loadCatalog() {
+            if (!catalog) catalog = $.getJSON('apiverve/catalog');
+            return catalog;
+        }
+
+        function showParams(api) {
+            const box = $('#node-input-apiverve-params');
+            box.empty();
+            if (!api) return;
+            if (!api.params.length) { box.text('This API takes no parameters.'); return; }
+            api.params.forEach(function (p) {
+                const row = $('<div style="margin-bottom:4px">');
+                $('<code>').text(p.name).appendTo(row);
+                if (p.required) $('<span style="color:#c0392b"> required</span>').appendTo(row);
+                if (p.description) $('<span>').text(' — ' + p.description).appendTo(row);
+                box.append(row);
+            });
+        }
+
+        RED.nodes.registerType('apiverve', {
+            category: 'network',
+            color: '#a8b9ff',
+            defaults: {
+                name: { value: '' },
+                account: { value: '', type: 'apiverve-config' },
+                api: { value: 'emailvalidator' },
+                params: {
+                    value: '',
+                    validate: function (v) { if (!v) return true; try { JSON.parse(v); return true; } catch (e) { return false; } },
+                },
+                output: { value: 'data' },
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: 'apiverve.svg',
+            paletteLabel: 'apiverve',
+            label: function () { return this.name || this.api || 'apiverve'; },
+            labelStyle: function () { return this.name ? 'node_label_italic' : ''; },
+            oneditprepare: function () {
+                const node = this;
+                const select = $('#node-input-api');
+                select.empty().append($('<option>').val(node.api).text(node.api + ' (loading list…)'));
+                loadCatalog().then(function (apis) {
+                    const byCat = {};
+                    apis.forEach(function (a) { (byCat[a.category] = byCat[a.category] || []).push(a); });
+                    select.empty();
+                    Object.keys(byCat).sort().forEach(function (cat) {
+                        const group = $('<optgroup>').attr('label', cat);
+                        byCat[cat].sort(function (a, b) { return a.title.localeCompare(b.title); }).forEach(function (a) {
+                            group.append($('<option>').val(a.id).text(a.title + ' (' + a.id + ')'));
+                        });
+                        select.append(group);
+                    });
+                    select.val(node.api);
+                    const find = function () { return apis.find(function (a) { return a.id === select.val(); }); };
+                    select.on('change', function () { showParams(find()); });
+                    showParams(find());
+                }).fail(function () {
+                    select.empty().append($('<option>').val(node.api).text(node.api));
+                    $('#node-input-apiverve-params').text('Could not load the API list. You can still type parameters as JSON.');
+                });
+            },
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="apiverve">
+    <div class="form-row">
+        <label for="node-input-account"><i class="fa fa-key"></i> Account</label>
+        <input type="text" id="node-input-account">
+    </div>
+    <div class="form-row">
+        <label for="node-input-api"><i class="fa fa-plug"></i> API</label>
+        <select id="node-input-api" style="width:70%"></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-params"><i class="fa fa-sliders"></i> Parameters</label>
+        <input type="text" id="node-input-params" placeholder='{"email": "support@myspace.com"}' style="width:70%">
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <div id="node-input-apiverve-params" style="display:inline-block;width:70%;font-size:12px;opacity:.85"></div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-output"><i class="fa fa-sign-out"></i> Output</label>
+        <select id="node-input-output" style="width:70%">
+            <option value="data">Data only</option>
+            <option value="full">Full response (status, error, data)</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="apiverve">
+    <p>Calls any APIVerve API and returns the result as <code>msg.payload</code>.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">payload <span class="property-type">object | string</span></dt>
+        <dd>Parameters for the call, e.g. <code>{"email": "a@b.com"}</code>. A plain value fills the API's only required parameter, so an inject node can send just an email address or an IP.</dd>
+        <dt class="optional">params <span class="property-type">object</span></dt>
+        <dd>More parameters, applied last.</dd>
+        <dt class="optional">api <span class="property-type">string</span></dt>
+        <dd>An API id, such as <code>iplookup</code>, overriding the one picked in the node.</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>The API's <code>data</code>, or the whole response if Output is set to full.</dd>
+        <dt>statusCode <span class="property-type">number</span></dt>
+        <dd>The HTTP status.</dd>
+        <dt>apiverve <span class="property-type">object</span></dt>
+        <dd><code>api</code> and <code>remainingCredits</code> on your plan.</dd>
+    </dl>
+    <h3>Details</h3>
+    <p>Parameters from the node, the payload and <code>msg.params</code> are merged in that order. Errors (bad key, missing parameter, rate limit) go to a Catch node with <code>msg.statusCode</code> set: 401 is a bad key, 403 a key not allowed for this call, and 429 a rate limit or no credits left.</p>
+    <p>Browse every API at <a href="https://apiverve.com/marketplace" target="_blank">apiverve.com/marketplace</a>.</p>
+</script>

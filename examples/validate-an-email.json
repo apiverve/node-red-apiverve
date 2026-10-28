@@ -1,0 +1,43 @@
+[
+    {
+        "id": "a1f0c0de00000001",
+        "type": "inject",
+        "name": "an email address",
+        "props": [{ "p": "payload" }],
+        "repeat": "",
+        "once": false,
+        "topic": "",
+        "payload": "support@myspace.com",
+        "payloadType": "str",
+        "x": 150,
+        "y": 80,
+        "wires": [["a1f0c0de00000002"]]
+    },
+    {
+        "id": "a1f0c0de00000002",
+        "type": "apiverve",
+        "name": "Validate email",
+        "account": "a1f0c0de00000004",
+        "api": "emailvalidator",
+        "params": "",
+        "output": "data",
+        "x": 360,
+        "y": 80,
+        "wires": [["a1f0c0de00000003"]]
+    },
+    {
+        "id": "a1f0c0de00000003",
+        "type": "debug",
+        "name": "result",
+        "active": true,
+        "complete": "payload",
+        "x": 550,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "a1f0c0de00000004",
+        "type": "apiverve-config",
+        "name": "APIVerve"
+    }
+]

@@ -1,0 +1,50 @@
+{
+  "name": "@apiverve/node-red-apiverve",
+  "version": "0.1.0",
+  "description": "Node-RED node for APIVerve: call any of 380+ APIs (email and phone validation, IP lookup, weather, currency, DNS, PDF and more) with one API key.",
+  "keywords": [
+    "node-red",
+    "apiverve",
+    "api",
+    "email validation",
+    "ip lookup",
+    "weather",
+    "currency",
+    "dns"
+  ],
+  "homepage": "https://apiverve.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apiverve/node-red-apiverve.git"
+  },
+  "bugs": {
+    "url": "https://github.com/apiverve/node-red-apiverve/issues"
+  },
+  "license": "MIT",
+  "author": "APIVerve <hello@apiverve.com>",
+  "files": [
+    "nodes",
+    "lib",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "node-red": {
+    "version": ">=3.0.0",
+    "nodes": {
+      "apiverve": "nodes/apiverve.js"
+    }
+  },
+  "scripts": {
+    "test": "mocha test/*.spec.js"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.3",
+    "node-red": "^4.0.9",
+    "node-red-node-test-helper": "^0.3.4",
+    "should": "^13.2.3"
+  }
+}
