@@ -1,6 +1,6 @@
 {
   "name": "@apiverve/node-red-apiverve",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Node-RED node for APIVerve: call any of 380+ APIs (email and phone validation, IP lookup, weather, currency, DNS, PDF and more) with one API key.",
   "keywords": [
     "node-red",

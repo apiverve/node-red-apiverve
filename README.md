@@ -16,7 +16,7 @@ Requires Node-RED 3.0+ and Node.js 18+.
 
 ## Set up
 
-1. Get a free API key at [dashboard.apiverve.com](https://dashboard.apiverve.com).
+1. Get a free API key at [dashboard.apiverve.com](https://dashboard.apiverve.com/signup?utm_source=node-red&utm_medium=referral&utm_campaign=integrations&utm_content=readme).
 2. Drag an **apiverve** node (Network section) into a flow and open it.
 3. Add an **Account** with your key, then pick an API from the list. The editor shows that API's parameters.
 
